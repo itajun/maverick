@@ -1,19 +1,21 @@
 import React, { useContext, useEffect, useState } from "react";
 import { AppContext } from "../../App";
-import { Checkbox, List, ListItem, Typography } from "../../../node_modules/@mui/material/index";
+import { Box, Checkbox, List, ListItem, Typography } from "../../../node_modules/@mui/material/index";
 
 const FileList = ({ files, selectedFiles, toggleFile }) =>
-  <List>
-    {files && files.map(([ filename, fileguid]) => (
-      <ListItem key={fileguid} sx={{ p: 0 }}>
-        <Checkbox
-          checked={selectedFiles.length > 0 && selectedFiles.includes(fileguid)}
-          onChange={() => toggleFile(fileguid)}
-          size="small" />
-        <Typography>{filename}</Typography>
-      </ListItem>
-    ))}
-  </List>
+  <Box id='root-file-list' sx={{ display: 'flex', flexDirection: 'column', flex: 1, overflowY: 'scroll' }}>
+    <List>
+      {files && files.map(([filename, fileguid]) => (
+        <ListItem key={fileguid} sx={{ p: 0 }}>
+          <Checkbox
+            checked={selectedFiles.length > 0 && selectedFiles.includes(fileguid)}
+            onChange={() => toggleFile(fileguid)}
+            size="small" />
+          <Typography>{filename}</Typography>
+        </ListItem>
+      ))}
+    </List>
+  </Box>
 
 export default () => {
   const { esStore, esIndex, selectedFiles, toggleFile } = useContext(AppContext);
@@ -21,7 +23,7 @@ export default () => {
   const [files, setFiles] = useState([]);
 
   const loadFiles = async () => {
-    let result = await esStore.doesIndexExist(esIndex) && await esStore.search(esIndex, 
+    let result = await esStore.doesIndexExist(esIndex) && await esStore.search(esIndex,
       {
         "query": {
           "match_all": {}
@@ -36,7 +38,8 @@ export default () => {
                 {
                   "field": "fileguid"
                 }
-              ]
+              ],
+              size: 100
             }
           }
         },

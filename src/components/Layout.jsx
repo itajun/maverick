@@ -13,10 +13,10 @@ import EntryFinder from "./logviewer/EntryFinder";
 
 const Main = () => {
     return (<Box id='main-root' component="div" sx={{ display: 'flex', flex: 1, pt: '65px' }}>
-        <Box sx={{ minWidth: 300, flex: 2 }}>
+        <Box sx={{ minWidth: 300, flex: 2, display: 'flex' }}>
             <Drawer />
         </Box>
-        <Box sx={{ display: 'flex', flex: 8, height: 'inherit' }}>
+        <Box sx={{ display: 'flex', flex: 8 }}>
             <EntryFinder />
         </Box>
     </Box>

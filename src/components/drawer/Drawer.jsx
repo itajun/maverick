@@ -10,7 +10,7 @@ export default () => {
     const { esStore, esIndex, toggleFile } = useContext(AppContext)
 
     return (
-        <Box>
+        <Box id='root-drawer' sx={{ display: 'flex', flexDirection: 'column', flex: 1 }}>
             <IndexSelector />
 
             <FileDropZone processorFactory={file => new LoadFileToESProcessor(esStore, esIndex, file)} processorCompleted={processor => toggleFile(processor.fileGuid)} />

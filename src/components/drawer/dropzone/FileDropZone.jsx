@@ -1,5 +1,6 @@
 import { Paper } from "@mui/material";
 import React, { useState } from "react";
+import JSZip from "jszip";
 import FileProcessorProgressTracker from "./FileProcessorProgressTracker";
 import FileProgress from "./FileProgress";
 
@@ -21,7 +22,7 @@ export default ({ processorFactory, processorCompleted }) => {
   const [processors, setProcessors] = useState([]);
 
   const completionCallback = processor => {
-    setProcessors(p => p.filter(e => e !== processor))  
+    setProcessors(p => p.filter(e => e !== processor))
     processorCompleted && processorCompleted(processor);
   }
 
@@ -41,10 +42,23 @@ export default ({ processorFactory, processorCompleted }) => {
       return;
     }
 
-    // Extract from zip
-    console.log(fileName);
+    if (fileName.endsWith('zip')) {
+      JSZip.loadAsync(file)
+        .then(function (zip) {
+          zip.forEach((relativePath, zipEntry) => {
+            console.log(`Reading ${relativePath}/${zipEntry.name}`)
+            if (relativePath.endsWith('.log') || relativePath.endsWith('.zip')) {
+              zipEntry.async('blob').then(blob => {
+                handleFile(new File([blob], relativePath.replaceAll('/', '_').replaceAll('\\', '_')))
+              })
+            }
+          });
+        }, e => {
+          console.error(e);
+        });
+    }
 
-
+    console.error(`Skipping unsupported file type` + fileName);
   }
 
   const dropHandler = async ev => {
