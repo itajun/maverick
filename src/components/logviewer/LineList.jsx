@@ -1,54 +1,54 @@
-import React, { Fragment, useContext, useEffect, useState } from "react";
-import { Box } from "../../../node_modules/@mui/material/index";
-import { AppContext } from "../../App";
+import React, { Fragment, useContext, useEffect, useState } from 'react';
+import { Box } from '../../../node_modules/@mui/material/index';
+import { AppContext } from '../../App';
 
-export default ({ searchText = "", fileGuid, lineNumber = 0 }) => {
+const LineList = ({ searchText = '', fileGuid, lineNumber = 0 }) => {
     const { esStore, esIndex } = useContext(AppContext);
 
     const [lines, setLines] = useState([]);
 
     const loadLines = async () => {
         const result = await esStore.search(esIndex, {
-            "query": {
-                "query_string": {
-                    "query": `fileguid: ${fileGuid} && linenumber:[${lineNumber - 10} TO ${lineNumber + 240}]`
+            'query': {
+                'query_string': {
+                    'query': `fileguid: ${fileGuid} && linenumber:[${lineNumber - 10} TO ${lineNumber + 240}]`
                 }
             },
-            "_source": [
-                "linenumber",
-                "rawline"
+            '_source': [
+                'linenumber',
+                'rawline'
             ],
-            "sort": [
+            'sort': [
                 {
-                    "fileguid": {
-                        "order": "asc"
+                    'fileguid': {
+                        'order': 'asc'
                     }
                 },
                 {
-                    "linenumber": {
-                        "order": "asc"
+                    'linenumber': {
+                        'order': 'asc'
                     }
                 }
             ],
-            "highlight": {
-                "highlight_query": {
-                    "simple_query_string": {
-                        "query": searchText,
-                        "fields": ["rawline"]
+            'highlight': {
+                'highlight_query': {
+                    'simple_query_string': {
+                        'query': searchText,
+                        'fields': ['rawline']
                     }
                 },
-                "fields":
+                'fields':
                 {
-                    "rawline": {
-                        "fragment_size": 4096
+                    'rawline': {
+                        'fragment_size': 4096
                     }
                 }
             },
-            "size": 250
-        })
+            'size': 250
+        });
 
         setLines(result.hits.hits.map(e => e.highlight ? { ...e._source, rawline: e.highlight.rawline[0] } : e._source));
-    }
+    };
 
     const toFormattedLine = line => {
         const parts = line.rawline.split(/<.?em>/);
@@ -63,12 +63,12 @@ export default ({ searchText = "", fileGuid, lineNumber = 0 }) => {
             } else {
                 partsComps.push((<pre key={`${line.linenumber}-${idx}`}>{part}</pre>));
             }
-        })
+        });
 
         return (<Fragment key={`${fileGuid}-${line.linenumber}`}>{partsComps}<br /></Fragment>);
-    }
+    };
 
-    useEffect(() => { loadLines() }, [fileGuid, lineNumber, searchText])
+    useEffect(() => { loadLines(); }, [fileGuid, lineNumber, searchText]);
 
     return (
         <Box sx={{ '& em': { background: 'yellow' }, '& pre': { display: 'inline' } }} >
@@ -78,5 +78,7 @@ export default ({ searchText = "", fileGuid, lineNumber = 0 }) => {
                 }
             </pre>
         </Box>
-    )
-}
+    );
+};
+
+export default LineList;

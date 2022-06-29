@@ -1,13 +1,13 @@
-import { useTheme } from "@mui/material/styles";
-import React, { useContext, useEffect, useState } from "react";
-import { AdminPanelSettings, AdminPanelSettingsOutlined, ContentCopy, ContentCopyOutlined, TableRows, TableRowsOutlined } from "../../../node_modules/@mui/icons-material/index";
-import { Box, Checkbox, CircularProgress, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, TextField, Tooltip, Typography } from "../../../node_modules/@mui/material/index";
-import { AppContext } from "../../App";
-import LineList from "./LineList";
+import { useTheme } from '@mui/material/styles';
+import React, { useContext, useEffect, useState } from 'react';
+import { AdminPanelSettings, AdminPanelSettingsOutlined, ContentCopy, ContentCopyOutlined, TableRows, TableRowsOutlined } from '../../../node_modules/@mui/icons-material/index';
+import { Box, Checkbox, CircularProgress, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, TextField, Tooltip, Typography } from '../../../node_modules/@mui/material/index';
+import { AppContext } from '../../App';
+import LineList from './LineList';
 
 
 // TODO: Break this massive component down
-export default () => {
+const EntryFinder = () => {
     const { esStore, esIndex, selectedFiles } = useContext(AppContext);
 
     const [loading, setLoading] = useState(true); // If data is loading
@@ -22,9 +22,9 @@ export default () => {
     const tableContainerRef = React.createRef(); // Reference to the table so we can scroll
     const linesRef = React.createRef(); // Reference to the lines viewer so we can scroll
 
-    const theme = useTheme()
+    const theme = useTheme();
 
-    useEffect(() => { loadData() }, [deduplicate, stackTrace, searchText, selectedFiles, esIndex]);
+    useEffect(() => { loadData(); }, [deduplicate, stackTrace, searchText, selectedFiles, esIndex]);
 
 
     // ********** Queries
@@ -36,20 +36,20 @@ export default () => {
 
         if (stackTrace) {
             filter.push({
-                "term": {
-                    "flags": "stacktrace"
+                'term': {
+                    'flags': 'stacktrace'
                 }
             });
         }
 
         if (selectedFiles && selectedFiles.length > 0) {
             const terms = selectedFiles.map(e => ({
-                "term": { "fileguid": { "value": e } }
+                'term': { 'fileguid': { 'value': e } }
             }));
 
             filter.push({
-                "bool": {
-                    "should": terms
+                'bool': {
+                    'should': terms
                 }
             });
         }
@@ -57,76 +57,76 @@ export default () => {
         if (searchText && searchText.length > 0) {
             if (advanced) {
                 must.push({
-                    "query_string": {
-                        "query": searchText,
-                        "default_field": "content"
+                    'query_string': {
+                        'query': searchText,
+                        'default_field': 'content'
                     }
-                })
+                });
             } else {
                 must.push({
-                    "simple_query_string": {
-                        "query": searchText,
-                        "fields": ["content"]
+                    'simple_query_string': {
+                        'query': searchText,
+                        'fields': ['content']
                     }
-                })
+                });
             }
         }
 
         return {
-            "query": {
-                "bool": {
+            'query': {
+                'bool': {
                     filter,
                     must
                 }
             },
-            "_source": ["fileguid", "filename", "entryfirstline", "linenumber", "timestamp", "loglevel", "content", "flags"],
-            "sort": [
+            '_source': ['fileguid', 'filename', 'entryfirstline', 'linenumber', 'timestamp', 'loglevel', 'content', 'flags'],
+            'sort': [
                 {
-                    "fileguid": {
-                        "order": "asc"
+                    'fileguid': {
+                        'order': 'asc'
                     }
                 },
                 {
-                    "linenumber": {
-                        "order": "asc"
+                    'linenumber': {
+                        'order': 'asc'
                     }
                 }
             ],
-            "aggs": aggs ? aggs : {},
-            "size": 1000
-        }
-    }
+            'aggs': aggs ? aggs : {},
+            'size': 1000
+        };
+    };
 
     // Just the aggregation that can be combined with query(^) above
-    const dedupEntriesAgg = query => {
+    const dedupEntriesAgg = () => {
         return {
-            "md5": {
-                "terms": {
-                    "field": "entrymd5",
-                    "size": 1000
+            'md5': {
+                'terms': {
+                    'field': 'entrymd5',
+                    'size': 1000
                 },
-                "aggs": {
-                    "first_doc": {
-                        "top_hits": {
-                            "_source": {
-                                "includes": [
-                                    "fileguid",
-                                    "filename",
-                                    "entryfirstline",
-                                    "linenumber",
-                                    "timestamp",
-                                    "loglevel",
-                                    "content",
-                                    "flags"
+                'aggs': {
+                    'first_doc': {
+                        'top_hits': {
+                            '_source': {
+                                'includes': [
+                                    'fileguid',
+                                    'filename',
+                                    'entryfirstline',
+                                    'linenumber',
+                                    'timestamp',
+                                    'loglevel',
+                                    'content',
+                                    'flags'
                                 ]
                             },
-                            "size": 1
+                            'size': 1
                         }
                     }
                 }
             }
-        }
-    }
+        };
+    };
 
     // ********* Methods
 
@@ -143,7 +143,7 @@ export default () => {
             const mergeProperties = bucket => {
                 const result = bucket.first_doc.hits.hits[0]._source;
                 return { ...result, doc_count: bucket.doc_count };
-            }
+            };
             setData(
                 result.aggregations.md5.buckets.map(e => mergeProperties(e))
             );
@@ -154,20 +154,20 @@ export default () => {
         }
         setLoading(false);
         setSelectedRow(null);
-    }
+    };
 
     // Marks the data as being loaded and calls the async search
     const loadData = async () => {
         setLoading(true);
         doSearch();
-    }
+    };
 
     // Marks the row as selected and makes sure the row is visible
     const handleSelectRow = (row, idx) => () => {
         setSelectedRow(row);
-        tableContainerRef.current.scrollTo(0, 33.02 * idx) // 33.02 - height of the row
-        linesRef && linesRef.current && linesRef.current.scrollTo(0, 0)
-    }
+        tableContainerRef.current.scrollTo(0, 33.02 * idx); // 33.02 - height of the row
+        linesRef && linesRef.current && linesRef.current.scrollTo(0, 0);
+    };
 
     // Helpers to check if the row/entry is selected based on the row
     const isSelRow = row => selectedRow && row.fileguid === selectedRow.fileguid && row.linenumber === selectedRow.linenumber;
@@ -177,11 +177,11 @@ export default () => {
     const delayedSearch = (text) => {
         if (searchTimeout) {
             clearTimeout(searchTimeout);
-        };
+        }
 
         setSearchTimeout(setTimeout(() => setSearchText(text), 500));
         setLoading(true);
-    }
+    };
 
     return (
         <Box id='entry-finder-root' sx={{ display: 'flex', flexDirection: 'column', width: '400px', flex: 1, p: '10px' }}>
@@ -253,5 +253,7 @@ export default () => {
                 }
             </Paper>
         </Box>
-    )
-}
+    );
+};
+
+export default EntryFinder;

@@ -1,28 +1,28 @@
 import { createFilterOptions } from '@mui/material/Autocomplete';
-import React, { useContext, useEffect } from "react";
-import { Autocomplete, TextField } from "../../../node_modules/@mui/material/index";
-import { AppContext } from "../../App";
+import React, { useContext, useEffect } from 'react';
+import { Autocomplete, TextField } from '../../../node_modules/@mui/material/index';
+import { AppContext } from '../../App';
 
-export default () => {
+const IndexSelector = () => {
 
-    const { esStore, esIndex, setSelectedIndex } = useContext(AppContext)
+    const { esStore, esIndex, setSelectedIndex } = useContext(AppContext);
 
     const [indexNames, setIndexNames] = React.useState([]);
 
     const filter = createFilterOptions();
 
     const loadIndexNames = async () => {
-        const indices = await esStore.getIndices()
-        setIndexNames(indices.map(e => { return { title: e.index } }))
-    }
+        const indices = await esStore.getIndices();
+        setIndexNames(indices.map(e => { return { title: e.index }; }));
+    };
 
-    useEffect(() => { loadIndexNames() }, [])
+    useEffect(() => { loadIndexNames(); }, []);
 
     return (
         <Autocomplete
             value={esIndex}
             onChange={(event, newValue) => {
-                const indexName = newValue && (newValue.inputValue || newValue.title || newValue)
+                const indexName = newValue && (newValue.inputValue || newValue.title || newValue);
                 setSelectedIndex(indexName);
             }}
             filterOptions={(options, params) => {
@@ -63,5 +63,7 @@ export default () => {
                 <TextField {...params} label="Index name" />
             )}
         />
-    )
-}
+    );
+};
+
+export default IndexSelector;
