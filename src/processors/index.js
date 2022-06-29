@@ -3,11 +3,19 @@ import { MD5 } from 'crypto-js';
 
 // TODO Ideally this would be called from a web worker
 // TODO These should be configurable and reside outside of this file
-const LOG_ENTRY_REGEX = /^(\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}.\d{3} .\d{4}) \[.*?] \d*? ([A-Z]+?) (.*? - )(.*)/
-const STACK_TRACE_REGEX = /^\s*?at \w+\.?\$?.+:\d+\).*/
+const LOG_ENTRY_REGEX =
+    /^(\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}.\d{3} .\d{4}) \[.*?] \d*? ([A-Z]+?) (.*? - )(.*)/;
+const STACK_TRACE_REGEX = /^\s*?at \w+\.?\$?.+:\d+\).*/;
 
 export class LoadFileToESProcessor {
-    constructor(esStore, indexName, file, progressCallback, completionCallback, esBatchSize = 10000) {
+    constructor(
+        esStore,
+        indexName,
+        file,
+        progressCallback,
+        completionCallback,
+        esBatchSize = 10000
+    ) {
         this.indexName = indexName;
         this.file = file;
         this.progressCallback = progressCallback; // Called for each line read
@@ -38,24 +46,26 @@ export class LoadFileToESProcessor {
         }
         this.processCalled = true; // Don't process 2X
 
-        console.debug(`Processing ${this.file.name} with size ${this.file.size}`);
+        console.debug(
+            `Processing ${this.file.name} with size ${this.file.size}`
+        );
 
         let reader = new FileReader();
         reader.onload = this.handleOnLoad(reader);
         reader.readAsText(this.file);
     }
 
-    handleOnLoad = reader => async () => {
+    handleOnLoad = (reader) => async () => {
         try {
             const fileGuid = this.fileGuid;
             const fileName = this.fileName;
 
             let lines = reader.result.split('\n');
 
-            let timestamp, logLevel // We replicate the timestamp and logLevel for multi-line entries
+            let timestamp, logLevel; // We replicate the timestamp and logLevel for multi-line entries
             for (var lineNumber = 0; lineNumber < lines.length; lineNumber++) {
                 if (this.cancelled) {
-                    console.warn("Process cancelled");
+                    console.warn('Process cancelled');
                     break;
                 }
 
@@ -63,10 +73,10 @@ export class LoadFileToESProcessor {
                 const docId = `${fileGuid}-${lineNumber}`;
 
                 let newLineDoc = {
-                    'fileguid': fileGuid,
-                    'filename': fileName,
-                    'type': 'line',
-                    'linenumber': lineNumber + 1
+                    fileguid: fileGuid,
+                    filename: fileName,
+                    type: 'line',
+                    linenumber: lineNumber + 1,
                 };
 
                 const match = line.match(LOG_ENTRY_REGEX);
@@ -79,8 +89,14 @@ export class LoadFileToESProcessor {
                     content = match[4];
 
                     this.updateCurrentEntryAndStartNew();
-                } else if (!timestamp) { // We haven't read any successful entry yet
-                    console.warn("Skipping leading invalid log entry: " + lineNumber + " - " + line);
+                } else if (!timestamp) {
+                    // We haven't read any successful entry yet
+                    console.warn(
+                        'Skipping leading invalid log entry: ' +
+                            lineNumber +
+                            ' - ' +
+                            line
+                    );
                     continue;
                 }
 
@@ -94,8 +110,11 @@ export class LoadFileToESProcessor {
                 this.entryDocIds.push(docId);
 
                 // Mark the entire entry as a stack trace if it matches the regex
-                if (!!line.match(STACK_TRACE_REGEX) && !this.entryFlags.includes("stacktrace")) {
-                    this.entryFlags.push("stacktrace");
+                if (
+                    !!line.match(STACK_TRACE_REGEX) &&
+                    !this.entryFlags.includes('stacktrace')
+                ) {
+                    this.entryFlags.push('stacktrace');
                 }
 
                 this.addIndexOperation(docId, newLineDoc);
@@ -120,15 +139,15 @@ export class LoadFileToESProcessor {
         }
         console.debug('Flushing: ' + this.currentBatch.length);
         await this.esStore.postToIndex(this.indexName, this.currentBatch);
-        await new Promise(r => setTimeout(r, 5)); // Give the UI some time to update when flushing
+        await new Promise((r) => setTimeout(r, 5)); // Give the UI some time to update when flushing
         this.currentBatch = [];
     }
 
     // Called when we have a new entry or finished the file, so we know the stack is complete
     // if we were in the process of capturing one.
     updateCurrentEntryAndStartNew() {
-        if (this.entryDocIds.length === 0) // First entry?
-        {
+        if (this.entryDocIds.length === 0) {
+            // First entry?
             return;
         }
 
@@ -137,14 +156,14 @@ export class LoadFileToESProcessor {
         this.logEntriesAdded++;
 
         // Add updates to all docs to add the relevant fields
-        this.entryDocIds.forEach(e => {
+        this.entryDocIds.forEach((e) => {
             this.addUpdateOperation(e, {
-                'doc': {
-                    'entryfirstline': this.logEntriesAdded,
-                    'entrymd5': entryMD5,
-                    'flags': this.entryFlags
-                }
-            })
+                doc: {
+                    entryfirstline: this.logEntriesAdded,
+                    entrymd5: entryMD5,
+                    flags: this.entryFlags,
+                },
+            });
         });
 
         this.entryDocIds = [];
@@ -155,25 +174,25 @@ export class LoadFileToESProcessor {
     addIndexOperation(id, o) {
         this.currentBatch.push(
             JSON.stringify({
-                'index': {
-                    '_index': this.indexName,
-                    '_id': id
-                }
+                index: {
+                    _index: this.indexName,
+                    _id: id,
+                },
             }),
             JSON.stringify(o)
-        )
+        );
     }
 
     addUpdateOperation(id, o) {
         this.currentBatch.push(
             JSON.stringify({
-                'update': {
-                    '_index': this.indexName,
-                    '_id': id
-                }
+                update: {
+                    _index: this.indexName,
+                    _id: id,
+                },
             }),
             JSON.stringify(o)
-        )
+        );
     }
 
     reportProgress(progress) {

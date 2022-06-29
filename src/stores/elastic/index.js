@@ -1,25 +1,27 @@
-const INDEX_PREFIX = "mvk-";
+const INDEX_PREFIX = 'mvk-';
 
 const esStore = (esURL) => {
     const defaultHeaders = {
-        'Content-Type': 'application/json'
-    }
+        'Content-Type': 'application/json',
+    };
 
     // TODO: Yes, I know... Handle errors :/
-    const prefixIndex = index => {
+    const prefixIndex = (index) => {
         if (!index.startsWith(INDEX_PREFIX)) {
             return INDEX_PREFIX + index;
         }
 
         return index;
-    }
+    };
 
     const getIndices = async () => {
-        const result = await fetch(`${esURL}/_cat/indices/${INDEX_PREFIX}*?s=index:asc&format=json`,
+        const result = await fetch(
+            `${esURL}/_cat/indices/${INDEX_PREFIX}*?s=index:asc&format=json`,
             {
-                method: "GET",
+                method: 'GET',
                 headers: defaultHeaders,
-            });
+            }
+        );
 
         if (result.ok) {
             return result.json();
@@ -28,17 +30,16 @@ const esStore = (esURL) => {
         console.error(result);
 
         return [];
-    }
+    };
 
     const search = async (index, payload) => {
         index = prefixIndex(index);
 
-        const result = await fetch(`${esURL}/${index}/_search`,
-            {
-                method: "POST",
-                headers: defaultHeaders,
-                body: JSON.stringify(payload)
-            });
+        const result = await fetch(`${esURL}/${index}/_search`, {
+            method: 'POST',
+            headers: defaultHeaders,
+            body: JSON.stringify(payload),
+        });
 
         if (result.ok) {
             return result.json();
@@ -47,16 +48,15 @@ const esStore = (esURL) => {
         console.error(result);
 
         return {};
-    }
+    };
 
-    const createAndConfigureIndex = async index => {
+    const createAndConfigureIndex = async (index) => {
         index = prefixIndex(index);
 
-        const result = await fetch(`${esURL}/${index}`,
-            {
-                method: "PUT",
-                headers: defaultHeaders,
-                body: `
+        const result = await fetch(`${esURL}/${index}`, {
+            method: 'PUT',
+            headers: defaultHeaders,
+            body: `
                 {
                     "mappings": {
                       "properties": {
@@ -82,25 +82,24 @@ const esStore = (esURL) => {
                       }
                     }
                   }
-                `
-            });
+                `,
+        });
 
-            if (!result.ok) {
-                console.error(result);
-            }
-    }
+        if (!result.ok) {
+            console.error(result);
+        }
+    };
 
-    const doesIndexExist = async index => {
+    const doesIndexExist = async (index) => {
         index = prefixIndex(index);
 
-        let response = await fetch(`${esURL}/_cat/indices/${index}`,
-            {
-                method: "GET",
-                headers: defaultHeaders,
-            });
+        let response = await fetch(`${esURL}/_cat/indices/${index}`, {
+            method: 'GET',
+            headers: defaultHeaders,
+        });
 
         return response.ok;
-    }
+    };
 
     const postToIndex = async (index, doc) => {
         index = prefixIndex(index);
@@ -111,20 +110,19 @@ const esStore = (esURL) => {
 
         let response;
         if (!Array.isArray(doc)) {
-            response = await fetch(`${esURL}/${index}/_doc?refresh=wait_for`,
-                {
-                    method: "POST",
-                    headers: defaultHeaders,
-                    body: doc
-                });
-        } else { // Some manual bulk request
+            response = await fetch(`${esURL}/${index}/_doc?refresh=wait_for`, {
+                method: 'POST',
+                headers: defaultHeaders,
+                body: doc,
+            });
+        } else {
+            // Some manual bulk request
             const body = doc.join(`\n`) + '\n';
-            response = await fetch(`${esURL}/${index}/_bulk?refresh=wait_for`,
-                {
-                    method: "POST",
-                    headers: defaultHeaders,
-                    body
-                });
+            response = await fetch(`${esURL}/${index}/_bulk?refresh=wait_for`, {
+                method: 'POST',
+                headers: defaultHeaders,
+                body,
+            });
         }
 
         if (!response || !response.ok) {
@@ -135,53 +133,55 @@ const esStore = (esURL) => {
                 console.error(jsonResponse);
             }
         }
-    }
+    };
 
-    const canConnect = async url => {
+    const canConnect = async (url) => {
         try {
-            let response = await fetch(`${url}/_cat/health`,
-                {
-                    method: "GET",
-                    headers: defaultHeaders,
-                });
+            let response = await fetch(`${url}/_cat/health`, {
+                method: 'GET',
+                headers: defaultHeaders,
+            });
 
             return response.ok;
         } catch {
             return false;
         }
-    }
+    };
 
-    const deleteIndices = async prefix => {
+    const deleteIndices = async (prefix) => {
         prefix = prefixIndex(prefix);
 
-        const result = await fetch(`${esURL}/_cat/indices/${prefix}*?s=index:asc&format=json`,
+        const result = await fetch(
+            `${esURL}/_cat/indices/${prefix}*?s=index:asc&format=json`,
             {
-                method: "GET",
+                method: 'GET',
                 headers: defaultHeaders,
-            });
+            }
+        );
 
-        (await result.json()).forEach(e => {
-            console.warn(`Deleting: ` + e.index)
-            fetch(`${esURL}/${e.index}`,
-            {
-                method: "DELETE",
+        (await result.json()).forEach((e) => {
+            console.warn(`Deleting: ` + e.index);
+            fetch(`${esURL}/${e.index}`, {
+                method: 'DELETE',
                 headers: defaultHeaders,
             });
-        })
-    }
+        });
+    };
 
     const updateByQuery = async (index, payload) => {
         index = prefixIndex(index);
 
-        const response = await fetch(`${esURL}/${index}/_update_by_query?refresh=true`,
-        {
-            method: "POST",
-            headers: defaultHeaders,
-            body: JSON.stringify(payload)
-        });
+        const response = await fetch(
+            `${esURL}/${index}/_update_by_query?refresh=true`,
+            {
+                method: 'POST',
+                headers: defaultHeaders,
+                body: JSON.stringify(payload),
+            }
+        );
 
-        return response.ok
-    }
+        return response.ok;
+    };
 
     return {
         createAndConfigureIndex,
@@ -191,8 +191,8 @@ const esStore = (esURL) => {
         getIndices,
         canConnect,
         deleteIndices,
-        updateByQuery
-    }
-}
+        updateByQuery,
+    };
+};
 
 export { esStore as esStoreFactory };

@@ -1,16 +1,23 @@
 import React, { useContext, useEffect, useRef, useState } from 'react';
 import { AppContext } from '../../App';
-import { Box, Checkbox, List, ListItem, TextField, Typography } from '../../../node_modules/@mui/material/index';
+import {
+    Box,
+    Checkbox,
+    List,
+    ListItem,
+    TextField,
+    Typography,
+} from '../../../node_modules/@mui/material/index';
 
 const FileListRenderer = ({ files, selectedFiles, toggleFile, renameFile }) => {
     const [editing, setEditing] = useState();
     const textBoxRef = useRef();
 
-    const handleEdit = guid => () => {
+    const handleEdit = (guid) => () => {
         setEditing(guid);
     };
 
-    const handleSave = guid => evt => {
+    const handleSave = (guid) => (evt) => {
         renameFile(guid, evt.target.value);
         setEditing(null);
     };
@@ -22,85 +29,120 @@ const FileListRenderer = ({ files, selectedFiles, toggleFile, renameFile }) => {
         }
     });
 
-    return (<Box id='root-file-list' sx={{ display: 'flex', flexDirection: 'column', flex: 1, overflowY: 'scroll' }}>
-        <List>
-            {files && files.map(([filename, fileguid]) => (
-                <ListItem key={fileguid} sx={{ p: 0 }}>
-                    <Checkbox
-                        checked={selectedFiles.length > 0 && selectedFiles.includes(fileguid)}
-                        onChange={() => toggleFile(fileguid)}
-                        size="small" />
-                    {editing === fileguid && (
-                        <TextField defaultValue={filename} onBlur={handleSave(fileguid)} inputRef={textBoxRef} />
-                    )}
-                    {editing !== fileguid && (
-                        <Typography sx={{ cursor: 'pointer' }} onClick={handleEdit(fileguid)}>{filename}</Typography>
-                    )}
-                </ListItem>
-            ))}
-        </List>
-    </Box>);
+    return (
+        <Box
+            id='root-file-list'
+            sx={{
+                display: 'flex',
+                flexDirection: 'column',
+                flex: 1,
+                overflowY: 'scroll',
+            }}>
+            <List>
+                {files &&
+                    files.map(([filename, fileguid]) => (
+                        <ListItem key={fileguid} sx={{ p: 0 }}>
+                            <Checkbox
+                                checked={
+                                    selectedFiles.length > 0 &&
+                                    selectedFiles.includes(fileguid)
+                                }
+                                onChange={() => toggleFile(fileguid)}
+                                size='small'
+                            />
+                            {editing === fileguid && (
+                                <TextField
+                                    defaultValue={filename}
+                                    onBlur={handleSave(fileguid)}
+                                    inputRef={textBoxRef}
+                                />
+                            )}
+                            {editing !== fileguid && (
+                                <Typography
+                                    sx={{ cursor: 'pointer' }}
+                                    onClick={handleEdit(fileguid)}>
+                                    {filename}
+                                </Typography>
+                            )}
+                        </ListItem>
+                    ))}
+            </List>
+        </Box>
+    );
 };
 
 const FileList = () => {
-    const { esStore, esIndex, selectedFiles, toggleFile } = useContext(AppContext);
+    const { esStore, esIndex, selectedFiles, toggleFile } =
+        useContext(AppContext);
 
     const [files, setFiles] = useState([]);
 
     const loadFiles = async () => {
-        let result = await esStore.doesIndexExist(esIndex) && await esStore.search(esIndex,
-            {
-                'query': {
-                    'match_all': {}
+        let result =
+            (await esStore.doesIndexExist(esIndex)) &&
+            (await esStore.search(esIndex, {
+                query: {
+                    match_all: {},
                 },
-                'aggs': {
-                    'files': {
-                        'multi_terms': {
-                            'terms': [
+                aggs: {
+                    files: {
+                        multi_terms: {
+                            terms: [
                                 {
-                                    'field': 'filename.keyword'
+                                    field: 'filename.keyword',
                                 },
                                 {
-                                    'field': 'fileguid'
-                                }
+                                    field: 'fileguid',
+                                },
                             ],
-                            size: 100
-                        }
-                    }
+                            size: 100,
+                        },
+                    },
                 },
-                'size': 0
-            }
-        );
+                size: 0,
+            }));
 
-        setFiles(result ? result.aggregations.files.buckets.map(e => e.key) : []);
+        setFiles(
+            result ? result.aggregations.files.buckets.map((e) => e.key) : []
+        );
     };
 
     const renameFile = async (guid, newName) => {
         if (!guid || !newName || newName.length === 0) {
-            console.warn('Will not rename because either guid or name are empty');
+            console.warn(
+                'Will not rename because either guid or name are empty'
+            );
             return;
         }
 
-        const updateOperation =
-    {
-        'script': {
-            'source': `ctx._source.filename = '${newName}'`,
-            'lang': 'painless'
-        },
-        'query': {
-            'term': {
-                'fileguid': guid
-            }
-        }
-    };
+        const updateOperation = {
+            script: {
+                source: `ctx._source.filename = '${newName}'`,
+                lang: 'painless',
+            },
+            query: {
+                term: {
+                    fileguid: guid,
+                },
+            },
+        };
 
         await esStore.updateByQuery(esIndex, updateOperation);
         loadFiles();
     };
 
-    useEffect(() => { loadFiles(); }, [selectedFiles, esIndex]);
+    useEffect(() => {
+        loadFiles();
+    }, [selectedFiles, esIndex]);
 
-    return <FileListRenderer files={files} selectedFiles={selectedFiles} toggleFile={toggleFile} renameFile={renameFile} />;
+    return (
+        <FileListRenderer
+            files={files}
+            selectedFiles={selectedFiles}
+            toggleFile={toggleFile}
+            renameFile={renameFile}
+        />
+    );
 };
 
 export default FileList;

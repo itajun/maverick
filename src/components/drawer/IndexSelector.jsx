@@ -1,10 +1,12 @@
 import { createFilterOptions } from '@mui/material/Autocomplete';
 import React, { useContext, useEffect } from 'react';
-import { Autocomplete, TextField } from '../../../node_modules/@mui/material/index';
+import {
+    Autocomplete,
+    TextField,
+} from '../../../node_modules/@mui/material/index';
 import { AppContext } from '../../App';
 
 const IndexSelector = () => {
-
     const { esStore, esIndex, setSelectedIndex } = useContext(AppContext);
 
     const [indexNames, setIndexNames] = React.useState([]);
@@ -13,16 +15,24 @@ const IndexSelector = () => {
 
     const loadIndexNames = async () => {
         const indices = await esStore.getIndices();
-        setIndexNames(indices.map(e => { return { title: e.index }; }));
+        setIndexNames(
+            indices.map((e) => {
+                return { title: e.index };
+            })
+        );
     };
 
-    useEffect(() => { loadIndexNames(); }, []);
+    useEffect(() => {
+        loadIndexNames();
+    }, []);
 
     return (
         <Autocomplete
             value={esIndex}
             onChange={(event, newValue) => {
-                const indexName = newValue && (newValue.inputValue || newValue.title || newValue);
+                const indexName =
+                    newValue &&
+                    (newValue.inputValue || newValue.title || newValue);
                 setSelectedIndex(indexName);
             }}
             filterOptions={(options, params) => {
@@ -30,7 +40,9 @@ const IndexSelector = () => {
 
                 const { inputValue } = params;
                 // Suggest the creation of a new value
-                const isExisting = options.some((option) => inputValue === option.title);
+                const isExisting = options.some(
+                    (option) => inputValue === option.title
+                );
                 if (inputValue !== '' && !isExisting) {
                     filtered.push({
                         inputValue,
@@ -60,7 +72,7 @@ const IndexSelector = () => {
             sx={{ m: 1, mt: 2 }}
             freeSolo
             renderInput={(params) => (
-                <TextField {...params} label="Index name" />
+                <TextField {...params} label='Index name' />
             )}
         />
     );

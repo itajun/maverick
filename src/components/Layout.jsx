@@ -21,14 +21,13 @@ import EntryFinder from './logviewer/EntryFinder';
 const Main = () => {
     return (
         <Box
-            id="main-root"
-            component="div"
-            sx={{ display: 'flex', flex: 1, pt: '65px' }}
-        >
-            <Box sx={{ minWidth: 300, flex: 2, display: 'flex' }}>
+            id='main-root'
+            component='div'
+            sx={{ display: 'flex', flex: 1, pt: '65px' }}>
+            <Box>
                 <Drawer />
             </Box>
-            <Box sx={{ display: 'flex', flex: 8 }}>
+            <Box id='xpto' sx={{ display: 'flex', flex: 1 }}>
                 <EntryFinder />
             </Box>
         </Box>
@@ -59,8 +58,8 @@ const Preferences = () => {
 
     return (
         <Box
-            id="preferences-root"
-            component="div"
+            id='preferences-root'
+            component='div'
             sx={{
                 display: 'flex',
                 alignItems: 'center',
@@ -68,18 +67,16 @@ const Preferences = () => {
                 flexDirection: 'column',
                 pt: '65px',
                 flex: 1,
-            }}
-        >
+            }}>
             <FormControl
                 sx={{ m: 3 }}
-                component="fieldset"
-                variant="standard"
-                style={{ padding: '25px 0', width: 450 }}
-            >
-                <FormLabel component="legend">Elasticsearch settings</FormLabel>
+                component='fieldset'
+                variant='standard'
+                style={{ padding: '25px 0', width: 450 }}>
+                <FormLabel component='legend'>Elasticsearch settings</FormLabel>
                 <FormGroup>
                     <TextField
-                        label="URL"
+                        label='URL'
                         error={!esConnected}
                         helperText={`Enter a valid ES URL (last valid: ${
                             esURL ? esURL : '-'
@@ -89,7 +86,7 @@ const Preferences = () => {
                     />
                     <Box sx={{ display: 'flex', mt: '15px' }}>
                         <TextField
-                            label="Remove these indices"
+                            label='Remove these indices'
                             helperText="No confirmation. We're adults."
                             value={esIndices}
                             onChange={(e) => setESIndices(e.target.value)}
@@ -98,8 +95,7 @@ const Preferences = () => {
                         <IconButton
                             onClick={handleDeleteIndices}
                             sx={{ height: 'fit-content', mt: '10px' }}
-                            disabled={!esConnected}
-                        >
+                            disabled={!esConnected}>
                             <AutoDelete />
                         </IconButton>
                     </Box>
@@ -107,21 +103,20 @@ const Preferences = () => {
             </FormControl>
             <FormControl
                 sx={{ m: 3 }}
-                component="fieldset"
-                variant="standard"
-                style={{ padding: '5px 0', width: 450 }}
-            >
-                <FormLabel component="legend">Other stuff</FormLabel>
+                component='fieldset'
+                variant='standard'
+                style={{ padding: '5px 0', width: 450 }}>
+                <FormLabel component='legend'>Other stuff</FormLabel>
                 <FormGroup>
                     <FormControlLabel
                         control={
                             <Checkbox
                                 checked={themeMode === 'dark'}
                                 onChange={toggleThemeMode}
-                                name="themeMode"
+                                name='themeMode'
                             />
                         }
-                        label="Dark Theme"
+                        label='Dark Theme'
                     />
                 </FormGroup>
             </FormControl>
@@ -161,18 +156,17 @@ const Layout = () => {
 
     return (
         <Box
-            id="layout-root"
-            sx={{ display: 'flex', height: 'inherit', width: 'inherit' }}
-        >
+            id='layout-root'
+            sx={{ display: 'flex', height: 'inherit', width: 'inherit' }}>
             <CssBaseline />
             <AppBar>
                 <Toolbar>
                     <HomeButton />
                     <Typography
-                        variant="h6"
+                        variant='h6'
                         noWrap
-                        component="div"
-                        href="/"
+                        component='div'
+                        href='/'
                         sx={{
                             mr: 2,
                             fontFamily: 'monospace',
@@ -182,17 +176,16 @@ const Layout = () => {
                             textDecoration: 'none',
                             ml: 2,
                             width: '100%',
-                        }}
-                    >
-            LOGUEI
+                        }}>
+                        LOGUEI
                     </Typography>
                     <SettingsButton />
                 </Toolbar>
             </AppBar>
             <Routes>
-                <Route path="/preferences" element={<Preferences />} />
+                <Route path='/preferences' element={<Preferences />} />
                 <Route
-                    path="/"
+                    path='/'
                     element={
                         esConnected ? (
                             <Main />
@@ -203,9 +196,8 @@ const Layout = () => {
                                     flex: 1,
                                     justifyContent: 'center',
                                     alignItems: 'center',
-                                }}
-                            >
-                ES not connected
+                                }}>
+                                ES not connected
                             </Typography>
                         )
                     }

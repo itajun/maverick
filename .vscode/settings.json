@@ -3,5 +3,17 @@
     "source.fixAll.eslint": true
   },
   "eslint.validate": ["javascript", "javascriptreact", "html"],
-  "eslint.lintTask.enable": true
+  "eslint.lintTask.enable": true,
+  "editor.defaultFormatter": "dbaeumer.vscode-eslint",
+  "editor.formatOnPaste": true,
+  "editor.formatOnSave": true,
+  "eslint.format.enable": true,
+  "prettier.singleQuote": true,
+  "prettier.jsxSingleQuote": true,
+  "javascript.preferences.quoteStyle": "single",
+  "html.completion.attributeDefaultValue": "singlequotes",
+  "files.autoSave": "onFocusChange",
+  "[javascriptreact]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  }
 }
