@@ -1,7 +1,7 @@
 import { useTheme } from '@mui/material/styles';
-import React, { useContext, useEffect, useState } from 'react';
+import React, { useContext, useState, useEffect } from 'react';
 import { AdminPanelSettings, AdminPanelSettingsOutlined, ContentCopy, ContentCopyOutlined, TableRows, TableRowsOutlined } from '../../../node_modules/@mui/icons-material/index';
-import { Box, Checkbox, CircularProgress, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, TextField, Tooltip, Typography } from '../../../node_modules/@mui/material/index';
+import { Box, Checkbox, CircularProgress, Divider, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, TextField, Tooltip, Typography } from '../../../node_modules/@mui/material/index';
 import { AppContext } from '../../App';
 import LineList from './LineList';
 
@@ -19,13 +19,9 @@ const EntryFinder = () => {
     const [data, setData] = useState([]); // The rows TODO: Rename
     const [selectedRow, setSelectedRow] = useState(); // The selected row
 
-    const tableContainerRef = React.createRef(); // Reference to the table so we can scroll
-    const linesRef = React.createRef(); // Reference to the lines viewer so we can scroll
-
     const theme = useTheme();
 
     useEffect(() => { loadData(); }, [deduplicate, stackTrace, searchText, selectedFiles, esIndex]);
-
 
     // ********** Queries
 
@@ -165,8 +161,6 @@ const EntryFinder = () => {
     // Marks the row as selected and makes sure the row is visible
     const handleSelectRow = (row, idx) => () => {
         setSelectedRow(row);
-        tableContainerRef.current.scrollTo(0, 33.02 * idx); // 33.02 - height of the row
-        linesRef && linesRef.current && linesRef.current.scrollTo(0, 0);
     };
 
     // Helpers to check if the row/entry is selected based on the row
@@ -216,14 +210,14 @@ const EntryFinder = () => {
             <Paper id='root-table' sx={{ display: 'flex', flexDirection: 'column', p: '5px', m: '10px 0', height: '400px', flex: 1 }}>
                 {!loading && data.length === 0 && <Typography>Nothing to see here...</Typography>}
                 {data.length > 0 &&
-                    <TableContainer id='root-table-container' component={Paper} ref={tableContainerRef} sx={{maxHeight: selectedRow ? '30%' : null}}>
+                    <TableContainer id='root-table-container' component={Paper} sx={{maxHeight: selectedRow ? '30%' : null}}>
                         <Table size="small">
                             <TableHead>
                                 <TableRow>
                                     <TableCell style={{ border: 0 }}><Typography>{data.length >= 1000 ? '1000+' : data.length} results</Typography></TableCell>
                                 </TableRow>
                             </TableHead>
-                            <TableBody sx={{ '& pre': { 'padding': 0, 'margin': 0 } }}>
+                            <TableBody sx={{ '& td': { 'padding': '2px' }, '& pre': { 'padding': 0, 'margin': 0, fontSize: '0.75em'} }}>
                                 {
                                     data.map((row, idx) => (
                                         <TableRow key={`${row.fileguid}-${row.linenumber}`}
@@ -245,9 +239,10 @@ const EntryFinder = () => {
                         </Table>
                     </TableContainer>
                 }
+                <Divider sx={{ m: '5px 0' }} />
                 {
                     selectedRow &&
-                    <Box sx={{ flex: 1, width: '100%', overflow: 'scroll', p: '5px' }} ref={linesRef}>
+                    <Box sx={{ flex: 1, width: '100%', overflow: 'scroll', p: '5px', lineHeight: 1 }}>
                         <LineList searchText={searchText} fileGuid={selectedRow.fileguid} lineNumber={selectedRow.linenumber} />
                     </Box>
                 }

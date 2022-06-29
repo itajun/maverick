@@ -11,7 +11,7 @@ const LineList = ({ searchText = '', fileGuid, lineNumber = 0 }) => {
         const result = await esStore.search(esIndex, {
             'query': {
                 'query_string': {
-                    'query': `fileguid: ${fileGuid} && linenumber:[${lineNumber - 10} TO ${lineNumber + 240}]`
+                    'query': `fileguid: ${fileGuid} && linenumber:[${lineNumber - 5} TO ${lineNumber + 245}]`
                 }
             },
             '_source': [
@@ -65,13 +65,17 @@ const LineList = ({ searchText = '', fileGuid, lineNumber = 0 }) => {
             }
         });
 
+        if (line.linenumber === lineNumber) {
+            return (<span style={{ background: 'lightslategray' }} key={`${fileGuid}-${line.linenumber}`}>{partsComps}<br /></span>);
+        }
+
         return (<Fragment key={`${fileGuid}-${line.linenumber}`}>{partsComps}<br /></Fragment>);
     };
 
     useEffect(() => { loadLines(); }, [fileGuid, lineNumber, searchText]);
 
     return (
-        <Box sx={{ '& em': { background: 'yellow' }, '& pre': { display: 'inline' } }} >
+        <Box sx={{ '& em': { background: 'darkcyan' }, '& pre': { display: 'inline' } }} >
             <pre style={{ fontSize: '0.75em' }}>
                 {
                     lines.map(line => toFormattedLine(line))
