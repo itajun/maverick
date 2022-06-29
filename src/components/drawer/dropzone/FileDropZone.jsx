@@ -46,11 +46,12 @@ export default ({ processorFactory, processorCompleted }) => {
       JSZip.loadAsync(file)
         .then(function (zip) {
           zip.forEach((relativePath, zipEntry) => {
-            console.log(`Reading ${relativePath}/${zipEntry.name}`)
             if (relativePath.endsWith('.log') || relativePath.endsWith('.zip')) {
               zipEntry.async('blob').then(blob => {
                 handleFile(new File([blob], relativePath.replaceAll('/', '_').replaceAll('\\', '_')))
               })
+            } else {
+              console.debug(`Skipped ${relativePath}/${zipEntry.name}`)
             }
           });
         }, e => {

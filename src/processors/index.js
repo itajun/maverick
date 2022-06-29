@@ -1,6 +1,7 @@
 import { v4 as uuidv4 } from 'uuid';
 import { MD5 } from 'crypto-js';
 
+// TODO Ideally this would be called from a web worker
 // TODO These should be configurable and reside outside of this file
 const LOG_ENTRY_REGEX = /^(\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}.\d{3} .\d{4}) \[.*?] \d*? ([A-Z]+?) (.*? - )(.*)/
 const STACK_TRACE_REGEX = /^\s*?at \w+\.?\$?.+:\d+\).*/
@@ -117,7 +118,9 @@ export class LoadFileToESProcessor {
         if (this.currentBatch.length === 0) {
             return;
         }
+        console.debug('Flushing: ' + this.currentBatch.length);
         await this.esStore.postToIndex(this.indexName, this.currentBatch);
+        await new Promise(r => setTimeout(r, 5)); // Give the UI some time to update when flushing
         this.currentBatch = [];
     }
 
