@@ -4,6 +4,7 @@ import {
 } from "react-router-dom";
 import Layout from "./components/Layout";
 import { esStoreFactory } from "./stores/elastic";
+import { ThemeProvider, createTheme } from '@mui/material/styles';
 
 export const AppContext = React.createContext({})
 
@@ -12,7 +13,8 @@ export default (props) => {
     esIndex: "mvk-default",
     selectedFiles: [],
     esURL: localStorage.getItem('esURL'),
-    esConnected: false
+    esConnected: false,
+    themeMode: localStorage.getItem('themeMode') ? localStorage.getItem('themeMode') : 'light'
   });
 
   const esStore = esStoreFactory(state.esURL)
@@ -22,6 +24,20 @@ export default (props) => {
       setState({ ...state, esIndex: indexName })
     }
   }
+
+  const toggleThemeMode = () => {
+    setState(s => {
+      const mode = s.themeMode === 'light' ? 'dark' : 'light';
+      localStorage.setItem('themeMode', mode)
+      return { ...state, themeMode: mode }
+    })
+  }
+
+  const darkTheme = createTheme({
+    palette: {
+      mode: state.themeMode,
+    },
+  }, [state.themeMode]);
 
   const toggleFile = file => {
     setState(s => {
@@ -33,7 +49,7 @@ export default (props) => {
         selectedFiles = [...selectedFiles, file]
       }
 
-      return {...state, selectedFiles}
+      return { ...state, selectedFiles }
     });
   }
 
@@ -50,8 +66,7 @@ export default (props) => {
   }
 
   const testESConnection = async url => {
-    if (isValidHttpUrl(url))
-    {
+    if (isValidHttpUrl(url)) {
       if (await esStore.canConnect(url)) {
         setState({ ...state, esURL: url, esConnected: true })
         localStorage.setItem('esURL', url)
@@ -76,11 +91,15 @@ export default (props) => {
       toggleFile,
       esURL: state.esURL,
       testESConnection,
-      esConnected: state.esConnected
+      esConnected: state.esConnected,
+      themeMode: state.themeMode,
+      toggleThemeMode
     }}>
-      <Router>
-        <Layout />
-      </Router>
+      <ThemeProvider theme={darkTheme}>
+        <Router>
+          <Layout />
+        </Router>
+      </ThemeProvider>
     </AppContext.Provider>
   )
 }

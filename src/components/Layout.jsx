@@ -1,13 +1,13 @@
-import SettingsIcon from '@mui/icons-material/Settings';
 import { AppBar, Box, Toolbar, Typography } from "@mui/material";
-import { AppContext } from '../App';
+import { AutoDelete, Psychology } from "@mui/icons-material";
+import SettingsIcon from '@mui/icons-material/Settings';
+import { Checkbox, CssBaseline, FormControl, FormControlLabel, FormGroup, FormLabel, IconButton, TextField } from "@mui/material";
 import React, { useContext, useEffect, useState } from "react";
 import {
     Route, Routes
 } from "react-router-dom";
-import { AutoDelete, Psychology } from "../../node_modules/@mui/icons-material/index";
-import { CssBaseline, FormControl, FormGroup, FormLabel, IconButton, TextField } from "../../node_modules/@mui/material/index";
-import { useNavigate } from "../../node_modules/react-router-dom/index";
+import { useNavigate } from "react-router-dom/index";
+import { AppContext } from '../App';
 import Drawer from "./drawer/Drawer";
 import EntryFinder from "./logviewer/EntryFinder";
 
@@ -24,10 +24,9 @@ const Main = () => {
 }
 
 const Preferences = () => {
-    const { esStore, esURL, testESConnection, esConnected } = useContext(AppContext);
+    const { esStore, esURL, testESConnection, esConnected, themeMode, toggleThemeMode } = useContext(AppContext);
     const [tempURL, setTempURL] = useState(esURL ? esURL : '');
     const [esIndices, setESIndices] = useState('mvk-*');
-
 
     const handleOnChangeESURL = ev => {
         const url = ev.target.value;
@@ -35,12 +34,12 @@ const Preferences = () => {
         setTempURL(url);
     }
 
-    const handleDeleteIndices = async => {
+    const handleDeleteIndices = async () => {
         esStore.deleteIndices(esIndices);
     }
 
     return (
-        <Box id='preferences-root' component="div" sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', pt: '65px', flex: 1 }}>
+        <Box id='preferences-root' component="div" sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', flexDirection: 'column', pt: '65px', flex: 1 }}>
             <FormControl sx={{ m: 3 }} component="fieldset" variant="standard" style={{ padding: '25px 0', width: 450 }}>
                 <FormLabel component="legend">Elasticsearch settings</FormLabel>
                 <FormGroup>
@@ -63,6 +62,17 @@ const Preferences = () => {
                             <AutoDelete />
                         </IconButton>
                     </Box>
+                </FormGroup>
+            </FormControl>
+            <FormControl sx={{ m: 3 }} component="fieldset" variant="standard" style={{ padding: '5px 0', width: 450 }}>
+                <FormLabel component="legend">Other stuff</FormLabel>
+                <FormGroup>
+                    <FormControlLabel
+                        control={
+                            <Checkbox checked={themeMode === 'dark'} onChange={toggleThemeMode} name="themeMode" />
+                        }
+                        label="Dark Theme"
+                    />
                 </FormGroup>
             </FormControl>
         </Box>

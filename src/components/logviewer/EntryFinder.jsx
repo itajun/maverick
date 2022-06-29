@@ -1,3 +1,4 @@
+import { useTheme } from "@mui/material/styles";
 import React, { useContext, useEffect, useState } from "react";
 import { AdminPanelSettings, AdminPanelSettingsOutlined, ContentCopy, ContentCopyOutlined, TableRows, TableRowsOutlined } from "../../../node_modules/@mui/icons-material/index";
 import { Box, Checkbox, CircularProgress, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, TextField, Tooltip, Typography } from "../../../node_modules/@mui/material/index";
@@ -20,6 +21,8 @@ export default () => {
 
     const tableContainerRef = React.createRef(); // Reference to the table so we can scroll
     const linesRef = React.createRef(); // Reference to the lines viewer so we can scroll
+
+    const theme = useTheme()
 
     useEffect(() => { loadData() }, [deduplicate, stackTrace, searchText, selectedFiles, esIndex]);
 
@@ -224,7 +227,7 @@ export default () => {
                                 {
                                     data.map((row, idx) => (
                                         <TableRow key={`${row.fileguid}-${row.linenumber}`}
-                                            sx={{ '& td, & th': { backgroundColor: isSelRow(row) ? '#DDDDDD' : isSelEntry(row) ? '#CCCCCC' : null } }}
+                                            sx={{ '& td, & th': { backgroundColor: isSelRow(row) ? theme.palette.grey['500'] : isSelEntry(row) ? theme.palette.grey['400'] : null } }}
                                             onClick={handleSelectRow(row, idx)}>
                                             <TableCell>
                                                 <pre>{row.timestamp}</pre>

@@ -152,6 +152,8 @@ const esStore = (esURL) => {
     }
 
     const deleteIndices = async prefix => {
+        prefix = prefixIndex(prefix);
+
         const result = await fetch(`${esURL}/_cat/indices/${prefix}*?s=index:asc&format=json`,
             {
                 method: "GET",
@@ -168,6 +170,19 @@ const esStore = (esURL) => {
         })
     }
 
+    const updateByQuery = async (index, payload) => {
+        index = prefixIndex(index);
+
+        const response = await fetch(`${esURL}/${index}/_update_by_query?refresh=true`,
+        {
+            method: "POST",
+            headers: defaultHeaders,
+            body: JSON.stringify(payload)
+        });
+
+        return response.ok
+    }
+
     return {
         createAndConfigureIndex,
         doesIndexExist,
@@ -175,7 +190,8 @@ const esStore = (esURL) => {
         search,
         getIndices,
         canConnect,
-        deleteIndices
+        deleteIndices,
+        updateByQuery
     }
 }
 
