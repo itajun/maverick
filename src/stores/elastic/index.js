@@ -1,3 +1,4 @@
+const INDEX_PREFIX = "mvk-";
 
 const esStore = (esURL) => {
     const defaultHeaders = {
@@ -5,8 +6,33 @@ const esStore = (esURL) => {
     }
 
     // TODO: Yes, I know... Handle errors :/
+    const prefixIndex = index => {
+        if (!index.startsWith(INDEX_PREFIX)) {
+            return INDEX_PREFIX + index;
+        }
+
+        return index;
+    }
+
+    const getIndices = async () => {
+        const result = await fetch(`${esURL}/_cat/indices/${INDEX_PREFIX}*?s=index:asc&format=json`,
+            {
+                method: "GET",
+                headers: defaultHeaders,
+            });
+
+        if (result.ok) {
+            return result.json();
+        }
+
+        console.error(result);
+
+        return [];
+    }
 
     const search = async (index, payload) => {
+        index = prefixIndex(index);
+
         const result = await fetch(`${esURL}/${index}/_search`,
             {
                 method: "POST",
@@ -24,53 +50,76 @@ const esStore = (esURL) => {
     }
 
     const createAndConfigureIndex = async index => {
-        await fetch(`${esURL}/${index}`,
+        index = prefixIndex(index);
+
+        const result = await fetch(`${esURL}/${index}`,
             {
                 method: "PUT",
                 headers: defaultHeaders,
                 body: `
-          {
-            "mappings": {
-              "properties": {
-                "timestamp": { "type": "long" },
-                "messageClass": { "type": "keyword" },
-                "handlerClass": { "type": "keyword" },
-                "method": { "type": "keyword" },
-                "handledIn": { "type": "long" },
-                "threadName": { "type": "text" },
-              }
-            }
-          }
-        `
+                {
+                    "mappings": {
+                      "properties": {
+                        "type": { "type": "keyword" },
+                        "parentguid": { "type": "keyword" },
+                        "fileguid": { "type": "keyword" },
+                        "filename": { 
+                            "type": "text",
+                            "fields": {
+                                "keyword": { 
+                                    "type": "keyword"
+                                }
+                            }
+                        },
+                        "linenumber": { "type": "long" },
+                        "entryfirstline": { "type": "long" },
+                        "entrymd5": { "type": "keyword" },
+                        "timestamp": { "type": "date"},
+                        "loglevel": { "type": "keyword"},
+                        "content": { "type": "text" },
+                        "rawline": { "type": "text" },
+                        "flags": {"type": "keyword" }
+                      }
+                    }
+                  }
+                `
             });
+
+            if (!result.ok) {
+                console.error(result);
+            }
     }
 
     const doesIndexExist = async index => {
+        index = prefixIndex(index);
+
         let response = await fetch(`${esURL}/_cat/indices/${index}`,
             {
-                method: "GET"
+                method: "GET",
+                headers: defaultHeaders,
             });
 
         return response.ok;
     }
 
     const postToIndex = async (index, doc) => {
+        index = prefixIndex(index);
+
         if (!(await doesIndexExist(index))) {
             await createAndConfigureIndex(index);
         }
-        
+
         let response;
         if (!Array.isArray(doc)) {
-            response = await fetch(`${esURL}/${index}/_doc`,
+            response = await fetch(`${esURL}/${index}/_doc?refresh=wait_for`,
                 {
                     method: "POST",
                     headers: defaultHeaders,
                     body: doc
                 });
-        } else {
-            let body = `{"index": { "_index": "${index}" }}\n`;
-            body += doc.join(`\n${body}`) + '\n'; // Add index for each line :/
-            response = await fetch(`${esURL}/${index}/_bulk`,
+        } else { // Some manual bulk request
+            const body = doc.join(`\n`) + '\n';
+            response = await fetch(`${esURL}/${index}/_bulk?refresh=wait_for`,
                 {
                     method: "POST",
                     headers: defaultHeaders,
@@ -80,14 +129,53 @@ const esStore = (esURL) => {
 
         if (!response || !response.ok) {
             console.error(response);
+        } else {
+            const jsonResponse = await response.json();
+            if (jsonResponse.errors) {
+                console.error(jsonResponse);
+            }
         }
+    }
+
+    const canConnect = async url => {
+        try {
+            let response = await fetch(`${url}/_cat/health`,
+                {
+                    method: "GET",
+                    headers: defaultHeaders,
+                });
+
+            return response.ok;
+        } catch {
+            return false;
+        }
+    }
+
+    const deleteIndices = async prefix => {
+        const result = await fetch(`${esURL}/_cat/indices/${prefix}*?s=index:asc&format=json`,
+            {
+                method: "GET",
+                headers: defaultHeaders,
+            });
+
+        (await result.json()).forEach(e => {
+            console.warn(`Deleting: ` + e.index)
+            fetch(`${esURL}/${e.index}`,
+            {
+                method: "DELETE",
+                headers: defaultHeaders,
+            });
+        })
     }
 
     return {
         createAndConfigureIndex,
         doesIndexExist,
         postToIndex,
-        search
+        search,
+        getIndices,
+        canConnect,
+        deleteIndices
     }
 }
 
