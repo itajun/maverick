@@ -221,7 +221,7 @@ const EntryFinder = () => {
             sx={{
                 display: 'flex',
                 flexDirection: 'column',
-                width: '400px',
+                width: 0,
                 flex: 1,
                 p: '10px',
             }}>
@@ -238,11 +238,16 @@ const EntryFinder = () => {
                     <CircularProgress sx={{ color: 'white' }} size='1rem' />
                 </Box>
             )}
-            <Box sx={{ display: 'flex', flexDirection: 'row' }}>
+            <Box
+                sx={{
+                    display: 'flex',
+                    flexDirection: 'row',
+                    alignItems: 'center',
+                }}>
                 <TextField
                     label='Search...'
                     type='search'
-                    sx={{ flex: 1 }}
+                    sx={{ flex: 1, p: '0 5px 0' }}
                     onChange={(e) => delayedSearch(e.target.value)}
                     autoComplete='off'
                 />
@@ -252,6 +257,7 @@ const EntryFinder = () => {
                         checkedIcon={<AdminPanelSettings />}
                         checked={advanced}
                         onChange={(e) => setAdvanced(e.target.checked)}
+                        sx={{ height: 'fit-content' }}
                     />
                 </Tooltip>
                 <Tooltip title='Deduplicate'>
@@ -260,6 +266,7 @@ const EntryFinder = () => {
                         checkedIcon={<ContentCopy />}
                         checked={deduplicate}
                         onChange={(e) => setDeduplicate(e.target.checked)}
+                        sx={{ height: 'fit-content' }}
                     />
                 </Tooltip>
                 <Tooltip title='Stacktrace only'>
@@ -268,6 +275,7 @@ const EntryFinder = () => {
                         checkedIcon={<TableRows />}
                         checked={stackTrace}
                         onChange={(e) => setStackTrace(e.target.checked)}
+                        sx={{ height: 'fit-content' }}
                     />
                 </Tooltip>
             </Box>

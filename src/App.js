@@ -80,7 +80,7 @@ const App = () => {
             if (await esStore.canConnect(url)) {
                 setState({ ...state, esURL: url, esConnected: true });
                 localStorage.setItem('esURL', url);
-                console.log('Connected to ES at: ' + url);
+                console.debug('Connected to ES at: ' + url);
             } else {
                 console.warn('Unable to connect to: ' + url);
                 setState({ ...state, esConnected: false });

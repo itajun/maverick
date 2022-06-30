@@ -94,7 +94,7 @@ const Preferences = () => {
                         />
                         <IconButton
                             onClick={handleDeleteIndices}
-                            sx={{ height: 'fit-content', mt: '10px' }}
+                            sx={{ height: 'fit-content', m: '10px 0 0 5px' }}
                             disabled={!esConnected}>
                             <AutoDelete />
                         </IconButton>

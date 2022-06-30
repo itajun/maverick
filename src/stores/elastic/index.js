@@ -58,6 +58,15 @@ const esStore = (esURL) => {
             headers: defaultHeaders,
             body: `
                 {
+                    "settings": {
+                        "analysis": {
+                        "analyzer": {
+                            "default": {
+                            "type": "simple"
+                            }
+                        }
+                        }
+                    },
                     "mappings": {
                       "properties": {
                         "type": { "type": "keyword" },

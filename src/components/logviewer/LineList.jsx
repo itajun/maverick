@@ -38,7 +38,7 @@ const LineList = ({ searchText = '', fileGuid, lineNumber = 0 }) => {
                 },
                 fields: {
                     rawline: {
-                        fragment_size: 4096,
+                        number_of_fragments: 0,
                     },
                 },
             },
@@ -46,11 +46,20 @@ const LineList = ({ searchText = '', fileGuid, lineNumber = 0 }) => {
         });
 
         setLines(
-            result.hits.hits.map((e) =>
-                e.highlight
-                    ? { ...e._source, rawline: e.highlight.rawline[0] }
-                    : e._source
-            )
+            result.hits.hits.map((e) => {
+                // ES trims highlight results. We just want to keep the leading ones because of stack traces (\tat...)
+                const leadingBlankspaces = e._source.rawline.match(/^(\s+)/);
+                const maybeBlankspaces = leadingBlankspaces
+                    ? leadingBlankspaces[0]
+                    : null;
+
+                return e.highlight
+                    ? {
+                          ...e._source,
+                          rawline: maybeBlankspaces + e.highlight.rawline[0],
+                      }
+                    : e._source;
+            })
         );
     };
 
