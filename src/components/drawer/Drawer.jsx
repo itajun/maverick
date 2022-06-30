@@ -19,6 +19,7 @@ const Drawer = () => {
                 flexDirection: 'column',
                 flex: 1,
                 minWidth: drawerOpen ? '280px' : 0,
+                maxWidth: 300,
             }}>
             <Box
                 sx={{
@@ -32,7 +33,13 @@ const Drawer = () => {
                 </IconButton>
             </Box>
             {drawerOpen && (
-                <>
+                <Box
+                    sx={{
+                        display: 'flex',
+                        flexDirection: 'column',
+                        flex: 1,
+                        minHeight: '100px',
+                    }}>
                     <IndexSelector />
 
                     <FileDropZone
@@ -45,7 +52,7 @@ const Drawer = () => {
                     />
 
                     <FileList />
-                </>
+                </Box>
             )}
         </Box>
     );

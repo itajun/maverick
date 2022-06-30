@@ -3,8 +3,12 @@ import { MD5 } from 'crypto-js';
 
 // TODO Ideally this would be called from a web worker
 // TODO These should be configurable and reside outside of this file
-const LOG_ENTRY_REGEX =
-    /^(\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}.\d{3} .\d{4}) \[.*?] \d*? ([A-Z]+?) (.*? - )(.*)/;
+const LOG_ENTRY_REGEX_NUIX =
+    /^(\d{4}-\d{2}-\d{2}.\d{2}:\d{2}:\d{2}.\d{3} .\d{4}) \[.*?] \d*? ([A-Z]+?) .*? - (.*)/;
+const LOG_ENTRY_REGEX_ES =
+    /^\[(\d{4}-\d{2}-\d{2}.\d{2}:\d{2}:\d{2}).\d{3}]\[\w{4}.]\[.*?].*?].(.*)/;
+const LOG_ENTRY_REGEX_GENERIC =
+    /^.*?(\d{4}-\d{2}-\d{2}.\d{2}:\d{2}:\d{2}).*?(DEBUG|WARN|INFO|ERROR)(.*)/;
 const STACK_TRACE_REGEX = /^\s*?at \w+\.?\$?.+:\d+\).*/;
 
 export class LoadFileToESProcessor {
@@ -37,6 +41,8 @@ export class LoadFileToESProcessor {
         this.entryContent = []; // Content of the entry while we read it from multiple lines (so we can get the MD5)
         this.entryFlags = []; // Flags to be added to the entry
 
+        this.matcher = null; // Matcher used for this file
+
         this.logEntriesAdded = 0;
     }
 
@@ -54,6 +60,31 @@ export class LoadFileToESProcessor {
         reader.onload = this.handleOnLoad(reader);
         reader.readAsText(this.file);
     }
+
+    matchesNewEntry = (line) => {
+        if (this.matcher) {
+            return line.match(this.matcher);
+        }
+
+        // Matcher is not known yet
+        let result = line.match(LOG_ENTRY_REGEX_NUIX);
+        if (result) {
+            this.matcher = LOG_ENTRY_REGEX_NUIX;
+            this.matcherName = 'format-nuix';
+        } else if ((result = line.match(LOG_ENTRY_REGEX_ES))) {
+            this.matcher = LOG_ENTRY_REGEX_ES;
+            this.matcherName = 'format-es';
+        } else if ((result = line.match(LOG_ENTRY_REGEX_GENERIC))) {
+            this.matcher = LOG_ENTRY_REGEX_GENERIC;
+            this.matcherName = 'format-generic';
+        }
+
+        if (this.matcherName) {
+            console.info('Detected format: ' + this.matcherName);
+        }
+
+        return result;
+    };
 
     handleOnLoad = (reader) => async () => {
         try {
@@ -79,16 +110,16 @@ export class LoadFileToESProcessor {
                     linenumber: lineNumber + 1,
                 };
 
-                const match = line.match(LOG_ENTRY_REGEX);
+                const match = this.matchesNewEntry(line);
                 const newEntry = match && match.length > 0;
                 let content = null;
                 if (newEntry) {
                     timestamp = match[1];
                     logLevel = match[2];
-                    // 3 - Thread name
-                    content = match[4];
+                    content = match[3] ? match[3].trim() : match[3];
 
                     this.updateCurrentEntryAndStartNew();
+                    this.entryFlags.push(this.matcherName);
                 } else if (!timestamp) {
                     // We haven't read any successful entry yet
                     console.warn(

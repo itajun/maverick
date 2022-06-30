@@ -29,7 +29,8 @@ const FileDropZone = ({ processorFactory, processorCompleted }) => {
     const [processors, setProcessors] = useState([]);
 
     const completionCallback = (processor) => {
-        setProcessors((p) => p.filter((e) => e !== processor));
+        console.debug('Processor completed: ' + processor.fileName);
+        setProcessors((p) => p.filter((e) => e.progress < 100)); // May come from different threads, so don't remove only the one in the param
         processorCompleted && processorCompleted(processor);
     };
 

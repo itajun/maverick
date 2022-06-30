@@ -24,7 +24,7 @@ const Main = () => {
             id='main-root'
             component='div'
             sx={{ display: 'flex', flex: 1, pt: '65px' }}>
-            <Box>
+            <Box sx={{ display: 'flex' }}>
                 <Drawer />
             </Box>
             <Box id='xpto' sx={{ display: 'flex', flex: 1 }}>
