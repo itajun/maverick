@@ -1,7 +1,7 @@
 {
   "main.css": "/maverick/static/css/main.b205ec79.chunk.css",
-  "main.js": "/maverick/static/js/main.165d9a8d.chunk.js",
-  "main.js.map": "/maverick/static/js/main.165d9a8d.chunk.js.map",
+  "main.js": "/maverick/static/js/main.8d4b313b.chunk.js",
+  "main.js.map": "/maverick/static/js/main.8d4b313b.chunk.js.map",
   "runtime~main.js": "/maverick/static/js/runtime~main.150c225c.js",
   "runtime~main.js.map": "/maverick/static/js/runtime~main.150c225c.js.map",
   "static/js/2.7dec5055.chunk.js": "/maverick/static/js/2.7dec5055.chunk.js",
@@ -9,7 +9,7 @@
   "static/js/3.c0dfc813.chunk.js": "/maverick/static/js/3.c0dfc813.chunk.js",
   "static/js/3.c0dfc813.chunk.js.map": "/maverick/static/js/3.c0dfc813.chunk.js.map",
   "index.html": "/maverick/index.html",
-  "precache-manifest.7c5858d909cf2c6c7749f8be9024b818.js": "/maverick/precache-manifest.7c5858d909cf2c6c7749f8be9024b818.js",
+  "precache-manifest.66ccf5736c06b15863d66d961ba068f4.js": "/maverick/precache-manifest.66ccf5736c06b15863d66d961ba068f4.js",
   "service-worker.js": "/maverick/service-worker.js",
   "static/css/main.b205ec79.chunk.css.map": "/maverick/static/css/main.b205ec79.chunk.css.map"
 }
