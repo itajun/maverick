@@ -1,15 +1,15 @@
 {
-  "main.css": "./static/css/main.b205ec79.chunk.css",
-  "main.js": "./static/js/main.165d9a8d.chunk.js",
-  "main.js.map": "./static/js/main.165d9a8d.chunk.js.map",
-  "runtime~main.js": "./static/js/runtime~main.1d7a8dd9.js",
-  "runtime~main.js.map": "./static/js/runtime~main.1d7a8dd9.js.map",
-  "static/js/2.7dec5055.chunk.js": "./static/js/2.7dec5055.chunk.js",
-  "static/js/2.7dec5055.chunk.js.map": "./static/js/2.7dec5055.chunk.js.map",
-  "static/js/3.c0dfc813.chunk.js": "./static/js/3.c0dfc813.chunk.js",
-  "static/js/3.c0dfc813.chunk.js.map": "./static/js/3.c0dfc813.chunk.js.map",
-  "index.html": "./index.html",
-  "precache-manifest.a61d587106f5a6f099d39cbe5a2f9ab2.js": "./precache-manifest.a61d587106f5a6f099d39cbe5a2f9ab2.js",
-  "service-worker.js": "./service-worker.js",
-  "static/css/main.b205ec79.chunk.css.map": "./static/css/main.b205ec79.chunk.css.map"
+  "main.css": "/itajun/maverick/static/css/main.b205ec79.chunk.css",
+  "main.js": "/itajun/maverick/static/js/main.165d9a8d.chunk.js",
+  "main.js.map": "/itajun/maverick/static/js/main.165d9a8d.chunk.js.map",
+  "runtime~main.js": "/itajun/maverick/static/js/runtime~main.5a026af2.js",
+  "runtime~main.js.map": "/itajun/maverick/static/js/runtime~main.5a026af2.js.map",
+  "static/js/2.7dec5055.chunk.js": "/itajun/maverick/static/js/2.7dec5055.chunk.js",
+  "static/js/2.7dec5055.chunk.js.map": "/itajun/maverick/static/js/2.7dec5055.chunk.js.map",
+  "static/js/3.c0dfc813.chunk.js": "/itajun/maverick/static/js/3.c0dfc813.chunk.js",
+  "static/js/3.c0dfc813.chunk.js.map": "/itajun/maverick/static/js/3.c0dfc813.chunk.js.map",
+  "index.html": "/itajun/maverick/index.html",
+  "precache-manifest.f5bdf00c02b2999cc785093b70f19286.js": "/itajun/maverick/precache-manifest.f5bdf00c02b2999cc785093b70f19286.js",
+  "service-worker.js": "/itajun/maverick/service-worker.js",
+  "static/css/main.b205ec79.chunk.css.map": "/itajun/maverick/static/css/main.b205ec79.chunk.css.map"
 }
