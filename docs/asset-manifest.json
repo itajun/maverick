@@ -1,15 +1,15 @@
 {
-  "main.css": "/itajun/maverick/static/css/main.b205ec79.chunk.css",
-  "main.js": "/itajun/maverick/static/js/main.165d9a8d.chunk.js",
-  "main.js.map": "/itajun/maverick/static/js/main.165d9a8d.chunk.js.map",
-  "runtime~main.js": "/itajun/maverick/static/js/runtime~main.5a026af2.js",
-  "runtime~main.js.map": "/itajun/maverick/static/js/runtime~main.5a026af2.js.map",
-  "static/js/2.7dec5055.chunk.js": "/itajun/maverick/static/js/2.7dec5055.chunk.js",
-  "static/js/2.7dec5055.chunk.js.map": "/itajun/maverick/static/js/2.7dec5055.chunk.js.map",
-  "static/js/3.c0dfc813.chunk.js": "/itajun/maverick/static/js/3.c0dfc813.chunk.js",
-  "static/js/3.c0dfc813.chunk.js.map": "/itajun/maverick/static/js/3.c0dfc813.chunk.js.map",
-  "index.html": "/itajun/maverick/index.html",
-  "precache-manifest.f5bdf00c02b2999cc785093b70f19286.js": "/itajun/maverick/precache-manifest.f5bdf00c02b2999cc785093b70f19286.js",
-  "service-worker.js": "/itajun/maverick/service-worker.js",
-  "static/css/main.b205ec79.chunk.css.map": "/itajun/maverick/static/css/main.b205ec79.chunk.css.map"
+  "main.css": "/maverick/static/css/main.b205ec79.chunk.css",
+  "main.js": "/maverick/static/js/main.165d9a8d.chunk.js",
+  "main.js.map": "/maverick/static/js/main.165d9a8d.chunk.js.map",
+  "runtime~main.js": "/maverick/static/js/runtime~main.150c225c.js",
+  "runtime~main.js.map": "/maverick/static/js/runtime~main.150c225c.js.map",
+  "static/js/2.7dec5055.chunk.js": "/maverick/static/js/2.7dec5055.chunk.js",
+  "static/js/2.7dec5055.chunk.js.map": "/maverick/static/js/2.7dec5055.chunk.js.map",
+  "static/js/3.c0dfc813.chunk.js": "/maverick/static/js/3.c0dfc813.chunk.js",
+  "static/js/3.c0dfc813.chunk.js.map": "/maverick/static/js/3.c0dfc813.chunk.js.map",
+  "index.html": "/maverick/index.html",
+  "precache-manifest.7c5858d909cf2c6c7749f8be9024b818.js": "/maverick/precache-manifest.7c5858d909cf2c6c7749f8be9024b818.js",
+  "service-worker.js": "/maverick/service-worker.js",
+  "static/css/main.b205ec79.chunk.css.map": "/maverick/static/css/main.b205ec79.chunk.css.map"
 }
